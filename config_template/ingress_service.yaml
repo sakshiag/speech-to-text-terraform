@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: speech-to-text-ingress
+spec:
+  rules:
+  - host: ${host_name}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: speech-to-text
+          servicePort: 3000
+     
