@@ -11,7 +11,7 @@ data "ibm_account" "account" {
   org_guid = "${data.ibm_org.org.id}"
 }
 
-resource "ibm_container_cluster" "cluster" {
+/*resource "ibm_container_cluster" "cluster" {
   name         = "${var.cluster_name}"
   datacenter   = "${var.datacenter}"
   org_guid     = "${data.ibm_org.org.id}"
@@ -38,7 +38,7 @@ resource "ibm_container_cluster" "cluster" {
   isolation       = "${var.isolation}"
   public_vlan_id  = "${var.public_vlan_id}"
   private_vlan_id = "${var.private_vlan_id}"
-}
+}*/
 
 resource "ibm_service_instance" "service" {
   name       = "${var.service_instance_name}"
@@ -54,7 +54,7 @@ resource "ibm_service_key" "key" {
 }
 
 resource "ibm_container_bind_service" "bind_service" {
-  cluster_name_id             = "${ibm_container_cluster.cluster.name}"
+  cluster_name_id             = "speech-to-text"
   service_instance_space_guid = "${data.ibm_space.space.id}"
   service_instance_name_id    = "${ibm_service_instance.service.id}"
   namespace_id                = "default"
@@ -64,7 +64,7 @@ resource "ibm_container_bind_service" "bind_service" {
 }
 
 data "ibm_container_cluster_config" "cluster_config" {
-  cluster_name_id = "${ibm_container_cluster.cluster.name}"
+  cluster_name_id = "speech-to-text"
   org_guid        = "${data.ibm_org.org.id}"
   space_guid      = "${data.ibm_space.space.id}"
   account_guid    = "${data.ibm_account.account.id}"
@@ -86,16 +86,25 @@ resource "random_id" "name" {
   byte_length = 4
 }
 
+data "ibm_container_cluster" "cluster" {
+    org_guid        = "${data.ibm_org.org.id}"
+  space_guid      = "${data.ibm_space.space.id}"
+  account_guid    = "${data.ibm_account.account.id}"
+    cluster_name_id = "speech-to-text"
+}
+
 resource "template_dir" "config" {
   source_dir      = "${path.module}/config_template"
   destination_dir = "${path.cwd}/config"
 
   vars {
     service_name = "${ibm_service_instance.service.name}"
-    host_name = "${ibm_container_cluster.cluster.ingress_hostname}"
+    host_name = "${data.ibm_container_cluster.cluster.ingress_hostname}"
   }
 }
 
+
+
 output "app_url" {
-  value = "${ibm_container_cluster.cluster.ingress_hostname}"
+  value = "${data.ibm_container_cluster.cluster.ingress_hostname}"
 }
