@@ -29,8 +29,8 @@ variable "public_vlan_id" {
 
 }
 
-variable "subnet_id" {
-}
+/*variable "subnet_id" {
+}*/
 
 variable "service_instance_name" {
   default = "speech-to-text-service"
